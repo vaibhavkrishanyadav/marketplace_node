@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
-const Product = require('../models/productModel');
 
-const categorySchema = mongoose.Schema(
+const productSchema = mongoose.Schema(
     {
         title: {
             type: String,
@@ -16,13 +15,18 @@ const categorySchema = mongoose.Schema(
             type: String,
             required: [true, "Please add the desription"],
         },
-        products: [
-            Product.Schema,
-        ],
+        price: {
+            type: String,
+            required: [true, "Please add the price"],
+        },
+        category_id: {
+            type: String,
+            required: [true, "Please add the category Id"],
+        },
     },
     {
         timestamps: true,
     }
 );
 
-module.exports = mongoose.model('Category', categorySchema);
+module.exports = mongoose.model('Products', productSchema);
