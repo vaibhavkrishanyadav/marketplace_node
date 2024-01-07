@@ -1,4 +1,4 @@
-const asyncHandler = require('express-async-Handler');
+const asyncHandler = require('express-async-handler');
 const Category = require('../models/categoryModel');
 
 //@desc Get all category
