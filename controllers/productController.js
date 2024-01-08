@@ -1,4 +1,5 @@
 const asyncHandler = require('express-async-handler');
+const Category = require('../models/categoryModel');
 const Product = require('../models/productModel');
 
 //@desc Get product
@@ -23,6 +24,17 @@ const createProduct = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error("All fields are mandatory !");
     }
+    const category = await Category.findById(category_id);
+    if(!category) {
+        res.status(404);
+        throw new Error("Category not found");
+    }
+
+    if( category.owner_id.toString() !== req.user.id) {
+        res.status(403);
+        throw new Error("User don't have permission to add product in category");
+    }
+
     const product = await Product.create({
         title, 
         description,
@@ -30,6 +42,13 @@ const createProduct = asyncHandler(async (req, res) => {
         price,
         category_id,
     });
+
+    const updatedCategory = await Category.findByIdAndUpdate(
+        category_id,
+        { "$push": { products: product } },
+        { new: true, "upsert": true }, 
+    );
+
     res.status(201).json(product);
 });
 
