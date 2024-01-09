@@ -1,17 +1,18 @@
 const asyncHandler = require('express-async-handler');
-const Category = require('../models/categoryModel');
 const Product = require('../models/productModel');
 
-//@desc Get product
-//@route GET /api/category/product/:id
+//@desc Get all products of a category
+//@route GET /api/category/product
 //@access private
-const getProduct = asyncHandler(async (req, res) => {
-    const product = await Product.findById(req.params.id);
-    if(!product) {
-        res.status(404);
-        throw new Error("Product not found");
+const getAllProduct = asyncHandler(async (req, res) => {
+    console.log("The request body is :", req.body);
+    const { category_id } = req.body;
+    if(!category_id) {
+        res.status(400);
+        throw new Error("Category Id not found");
     }
-    res.status(200).json(note);
+    const product = await Product.find({ category_id: category_id });
+    res.status(200).json(product);
 });
 
 //@desc Create new product
@@ -24,17 +25,6 @@ const createProduct = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error("All fields are mandatory !");
     }
-    const category = await Category.findById(category_id);
-    if(!category) {
-        res.status(404);
-        throw new Error("Category not found");
-    }
-
-    if( category.owner_id.toString() !== req.user.id) {
-        res.status(403);
-        throw new Error("User don't have permission to add product in category");
-    }
-
     const product = await Product.create({
         title, 
         description,
@@ -42,14 +32,19 @@ const createProduct = asyncHandler(async (req, res) => {
         price,
         category_id,
     });
-
-    const updatedCategory = await Category.findByIdAndUpdate(
-        category_id,
-        { "$push": { products: product } },
-        { new: true, "upsert": true }, 
-    );
-
     res.status(201).json(product);
+});
+
+//@desc Get product
+//@route GET /api/category/product/:id
+//@access private
+const getProduct = asyncHandler(async (req, res) => {
+    const product = await Product.findById(req.params.id);
+    if(!product) {
+        res.status(404);
+        throw new Error("Product not found");
+    }
+    res.status(200).json(note);
 });
 
 //@desc Update product
@@ -95,4 +90,4 @@ const deleteProduct = asyncHandler(async (req, res) => {
     res.status(200).json(product);
 });
 
-module.exports = {getProduct, createProduct, updateProduct, deleteProduct};
+module.exports = {getAllProduct, getProduct, createProduct, updateProduct, deleteProduct};

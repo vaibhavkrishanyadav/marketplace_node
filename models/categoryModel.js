@@ -16,9 +16,6 @@ const categorySchema = mongoose.Schema(
             type: String,
             required: [true, "Please add the desription"],
         },
-        products: [{
-            type: Product.schema,
-        }],
     },
     {
         timestamps: true,
